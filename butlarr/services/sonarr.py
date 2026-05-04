@@ -63,6 +63,21 @@ class Sonarr(ExtArrService, ArrService):
         self.quality_profiles = self.get_quality_profiles()
         self.language_profiles = self.get_language_profiles()
 
+        if not self.root_folders:
+            logger.warning(
+                "No root folders configured! Please configure root folders inside the Sonarr interface. Otherwise Butlarr might not behave as expected."
+            )
+
+        if not self.quality_profiles:
+            logger.warning(
+                "No quality profiles configured! Please configure quality profiles inside the Sonarr interface. Otherwise Butlarr might not behave as expected."
+            )
+
+        if not self.language_profiles:
+            logger.warning(
+                "No language profiles configured! Please configure language profiles inside the Sonarr interface. Otherwise Butlarr might not behave as expected."
+            )
+
     def _get_season_state(self, item):
         available_seasons = [e.get("seasonNumber") for e in item.get("seasons")]
         monitored_seasons = []
@@ -341,7 +356,7 @@ class Sonarr(ExtArrService, ArrService):
             reply_markup=keyboard_markup,
             state=state,
         )
-    
+
     def _get_initial_state(self, items):
         return State(
             items=items,
@@ -473,7 +488,9 @@ class Sonarr(ExtArrService, ArrService):
             item = state.items[state.index]
             if "id" in item and item["id"] and not allow_edit:
                 # Don't do anything, illegal operation
-                return Response(caption="You are missing the permissions for this operation.")
+                return Response(
+                    caption="You are missing the permissions for this operation."
+                )
 
         full_redraw = False
         if args[0] == "goto":

@@ -13,7 +13,7 @@ def find_first(elems, check, fallback=0):
     except:
         result = None
     finally:
-        if not result:
+        if not result and elems:
             return elems[fallback]
         return result
 

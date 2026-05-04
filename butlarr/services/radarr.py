@@ -47,6 +47,16 @@ class Radarr(ExtArrService, ArrService):
         self.root_folders = self.get_root_folders()
         self.quality_profiles = self.get_quality_profiles()
 
+        if not self.root_folders:
+            logger.warning(
+                "No root folders configured! Please configure root folders inside the Sonarr interface. Otherwise Butlarr might not behave as expected."
+            )
+
+        if not self.quality_profiles:
+            logger.warning(
+                "No quality profiles configured! Please configure quality profiles inside the Sonarr interface. Otherwise Butlarr might not behave as expected."
+            )
+
     @keyboard
     def keyboard(self, state: State, allow_edit=False):
         item = state.items[state.index]
@@ -180,7 +190,10 @@ class Radarr(ExtArrService, ArrService):
                     )
                     rows_action.append(
                         [
-                            Button(f"✅ + 🔍 Submit & Search", self.get_clbk("add", "search")),
+                            Button(
+                                f"✅ + 🔍 Submit & Search",
+                                self.get_clbk("add", "search"),
+                            ),
                         ]
                     )
         else:
@@ -190,9 +203,7 @@ class Radarr(ExtArrService, ArrService):
                 rows_action.append(
                     [
                         Button(f"📺 Monitor", self.get_clbk("add", "no-search")),
-                        Button(
-                            f"🔍 Monitor & Search", self.get_clbk("add", "search")
-                        ),
+                        Button(f"🔍 Monitor & Search", self.get_clbk("add", "search")),
                     ]
                 )
 
@@ -233,7 +244,7 @@ class Radarr(ExtArrService, ArrService):
             reply_markup=keyboard_markup,
             state=state,
         )
-    
+
     def _get_initial_state(self, items):
         return State(
             items=items,
@@ -337,7 +348,9 @@ class Radarr(ExtArrService, ArrService):
             item = state.items[state.index]
             if "id" in item and item["id"] and not allow_edit:
                 # Don't do anything, illegal operation
-                return Response(caption="You are missing the permissions for this operation.")
+                return Response(
+                    caption="You are missing the permissions for this operation."
+                )
 
         full_redraw = False
         if args[0] == "goto":
@@ -399,8 +412,13 @@ class Radarr(ExtArrService, ArrService):
         if not result:
             return Response(caption="Seems like something went wrong...")
 
-        return Response(caption="Movie updated!" if state.items[state.index].get("id")
-                                    else "Movie added!")
+        return Response(
+            caption=(
+                "Movie updated!"
+                if state.items[state.index].get("id")
+                else "Movie added!"
+            )
+        )
 
     @clear
     @callback(cmds=["cancel"])
